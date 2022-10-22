@@ -1,6 +1,6 @@
 public class CounterOfWord {
-    private int countOfRepeatedWords;
-    private String word;
+    final private int countOfRepeatedWords;
+    final private String word;
 
     public int getCountOfRepeatedWords() {
         return countOfRepeatedWords;
