@@ -13,28 +13,31 @@ public class WordsService {
         this.someText = getCleanText();
     }
 
-    public String sentence(int index) {
+    public String getSentanceByIndex(int index) {
         List<String> arrayOfSentences = List.of(someText.split("\\."));
-        return arrayOfSentences.get(index - 1);
+        index -= 1;
+        if(index>arrayOfSentences.size() || index<arrayOfSentences.size()){
+            return null;
+        }
+        return arrayOfSentences.get(index);
     }
 
-    public HashSet<String> getAllUniqueWords() {
+    public Set<String> getAllUniqueWords() {
         List<String> arrayOfWords = getAllWords();
         return new HashSet<>(arrayOfWords);
     }
 
+
     private List<String> getAllWords() {
         List<String> arrayOfWords = List.of(someText.split(" "));
         List<String> cleanedArrayOfWords = new ArrayList<>();
-        String currentWord;
+
+        //If in middle part of word will be special char, it will removed. Am i need to fix this situation?
+
         for (int i = 0; i < arrayOfWords.size(); i++) {
-            currentWord = arrayOfWords.get(i);
-            currentWord = currentWord.replace(",", "");
-            currentWord = currentWord.replace(".", "");
-            currentWord = currentWord.replace("'", "");
-            currentWord = currentWord.replace("\n", "");
-            currentWord = currentWord.replace("-", "");
-            if (currentWord.isBlank()) {
+            String currentWord = arrayOfWords.get(i);
+            currentWord = currentWord.replaceAll("\\W","");
+            if(currentWord.isBlank()){
                 continue;
             }
             cleanedArrayOfWords.add(currentWord);
@@ -43,34 +46,29 @@ public class WordsService {
     }
 
     private String getCleanText() {
-        while (true) {
             boolean hasSeveralWhiteSpace = someText.contains("  ");
             if (hasSeveralWhiteSpace) {
                 someText = someText.replaceAll("  ", " ");
-                continue;
+                getCleanText();
             }
-            break;
-        }
         return someText;
     }
 
     public List<String> fixSyntax() {
-        List<String> sentences = List.of(someText.split("\\."));
         List<String> fixSentences = new ArrayList<>();
-        String currentSentences;
-        for(int i=0;i<sentences.size();i++){
-            currentSentences = sentences.get(i).trim();
-            if(currentSentences.isBlank()){
+        int index=1;
+        while(getSentanceByIndex(index)!=null){
+            if(getSentanceByIndex(index).isBlank()){
                 continue;
             }
-            fixSentences.add(currentSentences.substring(0,1).toUpperCase()+currentSentences.substring(1));
+            fixSentences.add(getSentanceByIndex(index).substring(0,1).toUpperCase()+getSentanceByIndex(index).substring(1));
+            index++;
         }
         return fixSentences;
     }
 
     public String removeArticles() {
-        String textWithoutArticles = someText;
-        textWithoutArticles = textWithoutArticles.replaceAll("^the\s"," ");
+        String textWithoutArticles = someText.replaceAll("^the\s"," ");
         textWithoutArticles = textWithoutArticles.replaceAll("^The\s"," ");
         textWithoutArticles = textWithoutArticles.replaceAll("^a\s"," ");
         textWithoutArticles = textWithoutArticles.replaceAll("^A\s"," ");
